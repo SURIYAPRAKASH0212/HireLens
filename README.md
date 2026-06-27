@@ -6,7 +6,7 @@ HireLens is a comprehensive AI-powered hiring assistant that simplifies applican
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 ### 1. Dual-Portal Roles
 - **Candidate Portal**:
@@ -30,7 +30,7 @@ HireLens is a comprehensive AI-powered hiring assistant that simplifies applican
 
 ---
 
-## 📁 Repository Contents
+## Repository Contents
 
 ```
 HireLens/
@@ -54,7 +54,7 @@ HireLens/
 
 ---
 
-## 🛠️ Getting Started & Setup
+## Getting Started & Setup
 
 ### Prerequisites
 - **Node.js** (v18 or higher recommended)
@@ -87,7 +87,7 @@ HireLens/
 
 ---
 
-## 💻 Running the Application
+## Running the Application
 
 To start both the backend server and the frontend Vite developer server concurrently from the root directory:
 
@@ -101,11 +101,11 @@ The application will be accessible at:
 
 ---
 
-## 📚 Educational Purposes and Limitations
+## Educational Purposes and Limitations
 - The resume parser and ATS matches are simulated via score algorithms based on user profile weights to model dynamic dashboard calculations.
 - File-based `database.json` storage is intended for quick-start development and local sandbox demonstrations only.
 
 ---
 
-## 👨‍💻 Author
+## Author
 - **Suriyaprakash** (GitHub: [@SURIYAPRAKASH0212](https://github.com/SURIYAPRAKASH0212))
