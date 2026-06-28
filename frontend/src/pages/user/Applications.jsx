@@ -53,7 +53,11 @@ export default function UserApplications() {
                 </div>
                 <div>
                   <h3 className="font-bold text-base">{app.jobTitle}</h3>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Applied on {app.appliedOn}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                    {app.companyName && <span className="font-semibold text-emerald-500">{app.companyName}</span>}
+                    {app.companyName && <span className="text-gray-300 dark:text-white/10">•</span>}
+                    <span>Applied on {app.appliedOn}</span>
+                  </p>
                 </div>
               </div>
               <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold

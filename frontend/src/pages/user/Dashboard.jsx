@@ -23,7 +23,8 @@ export default function UserDashboard({ setActiveTab }) {
     checklist, 
     toggleChecklistItem, 
     profileScore, 
-    simulateUpload 
+    simulateUpload,
+    jobs
   } = useApp();
   const { isDark } = useTheme();
 
@@ -32,6 +33,7 @@ export default function UserDashboard({ setActiveTab }) {
   const [uploadState, setUploadState] = useState('idle'); // idle, uploading, success
   const [uploadedFileName, setUploadedFileName] = useState('');
   const [progress, setProgress] = useState(0);
+  const [selectedJobId, setSelectedJobId] = useState(null);
   const fileInputRef = useRef(null);
 
   // SVG Circular progress configurations
@@ -122,7 +124,12 @@ export default function UserDashboard({ setActiveTab }) {
           clearInterval(interval);
           setUploadState('success');
           // Add to global state
-          simulateUpload(file.name);
+          const selectedJob = jobs.find(j => j.id === selectedJobId);
+          simulateUpload(
+            file.name, 
+            selectedJob ? selectedJob.title : 'Cloud Architect', 
+            selectedJob ? selectedJob.company : 'HireLens Corp'
+          );
           // Reset back to idle after 3 seconds
           setTimeout(() => {
             setUploadState('idle');
@@ -205,10 +212,84 @@ export default function UserDashboard({ setActiveTab }) {
         })}
       </div>
 
+      {/* Available Jobs / Open Positions */}
+      <motion.div variants={itemVariants} className="space-y-4" id="open-positions-section">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-lg">Available Jobs</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Explore active roles created by our recruitment team</p>
+          </div>
+        </div>
+
+        {jobs.length === 0 ? (
+          <div className={`p-8 text-center rounded-card border transition-all duration-300 user-glow
+            ${isDark ? 'bg-darkCard border-white/5 text-gray-400' : 'bg-white border-gray-150 shadow-sm text-gray-550'}`}
+          >
+            <p className="font-bold text-sm">No specific job openings listed yet.</p>
+            <p className="text-xs text-gray-400 mt-1">You can still submit your resume as a General Application below.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {jobs.map((job) => (
+              <div 
+                key={job.id}
+                className={`p-5 rounded-card border transition-all duration-300 user-glow flex flex-col justify-between
+                  ${isDark ? 'bg-darkCard border-white/5' : 'bg-white border-gray-100 shadow-sm'}`}
+              >
+                <div>
+                  <h4 className="font-bold text-base">{job.title}</h4>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1.5 flex-wrap">
+                    {job.company && <span className="font-bold text-emerald-500">{job.company}</span>}
+                    {job.company && <span className="text-gray-305">•</span>}
+                    <span>{job.dept}</span>
+                  </p>
+                  {job.skills && job.skills.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-3">
+                      {job.skills.map((skill, idx) => (
+                        <span 
+                          key={idx} 
+                          className={`text-[9px] font-bold px-2 py-0.5 rounded border
+                            ${isDark 
+                              ? 'bg-white/5 border-white/10 text-gray-300' 
+                              : 'bg-slate-50 border-gray-200 text-gray-600'
+                            }`}
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {job.description && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 line-clamp-2 leading-relaxed">
+                      {job.description}
+                    </p>
+                  )}
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-white/5 flex justify-between items-center text-xs">
+                  <span className="inline-flex px-2 py-0.5 rounded font-bold bg-emerald-500/10 text-emerald-500">
+                    Active
+                  </span>
+                  <button
+                    onClick={() => {
+                      setSelectedJobId(job.id);
+                      document.getElementById('upload-card-container')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="font-bold text-emerald-500 hover:text-emerald-600 transition-colors"
+                  >
+                    Apply Now
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </motion.div>
+
       {/* Middle Row: Upload + Applications Table */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Upload Resume Card */}
         <motion.div 
+          id="upload-card-container"
           variants={itemVariants}
           className={`p-6 rounded-card border lg:col-span-5 flex flex-col justify-between transition-all duration-300 user-glow
             ${isDark ? 'bg-darkCard border-white/5' : 'bg-white border-gray-100 shadow-sm'}`}
@@ -216,6 +297,23 @@ export default function UserDashboard({ setActiveTab }) {
           <div>
             <h3 className="font-bold text-lg">Upload Resume</h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Upload your latest resume to apply for jobs</p>
+            
+            {/* Position Selector Dropdown */}
+            <div className="mt-3">
+              <label className="block mb-1 text-[10px] uppercase tracking-wider text-gray-450 dark:text-gray-500 font-bold">Select target position</label>
+              <select
+                value={selectedJobId || ''}
+                onChange={(e) => setSelectedJobId(e.target.value ? Number(e.target.value) : null)}
+                className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-white/10 dark:bg-darkBg text-xs font-semibold focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none cursor-pointer"
+              >
+                <option value="">General Application (Cloud Architect)</option>
+                {jobs.map(job => (
+                  <option key={job.id} value={job.id}>
+                    {job.title} at {job.company || 'Unknown'}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div 
@@ -293,7 +391,9 @@ export default function UserDashboard({ setActiveTab }) {
                   </div>
                   <div>
                     <p className="text-sm font-bold text-emerald-500">Resume Screened Successfully!</p>
-                    <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">Cloud Architect position added</p>
+                    <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+                      {selectedJobId && jobs.find(j => j.id === selectedJobId) ? jobs.find(j => j.id === selectedJobId).title : 'Cloud Architect'} position added
+                    </p>
                   </div>
                 </motion.div>
               )}
@@ -341,7 +441,12 @@ export default function UserDashboard({ setActiveTab }) {
               <tbody className="divide-y divide-gray-100 dark:divide-white/5 text-xs font-medium">
                 {userApplications.map((row) => (
                   <tr key={row.id} className="hover:bg-slate-50/50 dark:hover:bg-white/1 transition-colors">
-                    <td className="py-3.5 font-semibold text-gray-900 dark:text-white">{row.jobTitle}</td>
+                    <td className="py-3.5">
+                      <div className="font-semibold text-gray-900 dark:text-white">{row.jobTitle}</div>
+                      {row.companyName && (
+                        <div className="text-[10px] font-bold text-emerald-500 mt-0.5">{row.companyName}</div>
+                      )}
+                    </td>
                     <td className="py-3.5 text-gray-500 dark:text-gray-400">{row.appliedOn}</td>
                     <td className="py-3.5">
                       <span className={`px-2 py-0.5 rounded-md font-bold font-mono text-[11px]

@@ -134,7 +134,7 @@ app.get('/api/applications', (req, res) => {
 
 // Resume Upload & ATS screening simulation
 app.post('/api/upload', (req, res) => {
-  const { fileName } = req.body;
+  const { fileName, jobTitle, companyName } = req.body;
   
   const randomScore = Math.floor(Math.random() * 25) + 75; // 75 - 99
   let fitStatus = 'In Review';
@@ -145,9 +145,13 @@ app.post('/api/upload', (req, res) => {
   const cleanName = fileName.replace(/\.[^/.]+$/, ""); // strip extension
   const parsedName = cleanName.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
+  const finalJobTitle = jobTitle || 'Cloud Architect';
+  const finalCompanyName = companyName || 'HireLens Corp';
+
   const newApp = {
     id: Date.now(),
-    jobTitle: 'Cloud Architect',
+    jobTitle: finalJobTitle,
+    companyName: finalCompanyName,
     appliedOn: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
     matchScore: randomScore,
     status: fitStatus
@@ -156,7 +160,7 @@ app.post('/api/upload', (req, res) => {
   const newCandidate = {
     id: Date.now() + 1,
     name: parsedName || 'Alex Mercer',
-    jobTitle: 'Cloud Architect',
+    jobTitle: finalJobTitle,
     score: randomScore,
     jobFit: randomScore,
     status: fitStatus,
@@ -178,7 +182,7 @@ app.post('/api/upload', (req, res) => {
 
   notifications.unshift({
     id: Date.now() + 3,
-    text: `New candidate ${newCandidate.name} screened for Cloud Architect (Score: ${randomScore})`,
+    text: `New candidate ${newCandidate.name} screened for ${finalJobTitle} (Score: ${randomScore})`,
     time: 'Just now',
     read: false,
     portal: 'admin'

@@ -9,16 +9,17 @@ export default function JobDescriptions() {
   const { jobs, addJob, deleteJob } = useApp();
 
   const [showModal, setShowModal] = useState(false);
-  const [newJob, setNewJob] = useState({ title: '', dept: '', skills: '', description: '' });
+  const [newJob, setNewJob] = useState({ title: '', dept: '', company: '', skills: '', description: '' });
 
   const handleAddJob = (e) => {
     e.preventDefault();
-    if (!newJob.title || !newJob.dept) return;
+    if (!newJob.title || !newJob.dept || !newJob.company) return;
     
     const job = {
       id: Date.now(),
       title: newJob.title,
       dept: newJob.dept,
+      company: newJob.company,
       applicants: 0,
       status: 'Active',
       skills: newJob.skills ? newJob.skills.split(',').map(s => s.trim()) : [],
@@ -26,7 +27,7 @@ export default function JobDescriptions() {
     };
 
     addJob(job);
-    setNewJob({ title: '', dept: '', skills: '', description: '' });
+    setNewJob({ title: '', dept: '', company: '', skills: '', description: '' });
     setShowModal(false);
   };
 
@@ -72,7 +73,11 @@ export default function JobDescriptions() {
                     </div>
                     <div>
                       <h3 className="font-bold text-lg">{job.title}</h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{job.dept}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5 flex-wrap">
+                        {job.company && <span className="font-bold text-primary">{job.company}</span>}
+                        {job.company && <span className="text-gray-300 dark:text-white/10">•</span>}
+                        <span>{job.dept}</span>
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -153,6 +158,17 @@ export default function JobDescriptions() {
                     placeholder="e.g. Senior Frontend Developer"
                     value={newJob.title}
                     onChange={(e) => setNewJob({...newJob, title: e.target.value})}
+                    className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-white/10 dark:bg-darkBg focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 text-gray-500">Company Name</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. HireLens Corp"
+                    value={newJob.company}
+                    onChange={(e) => setNewJob({...newJob, company: e.target.value})}
                     className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-white/10 dark:bg-darkBg focus:border-primary focus:ring-1 focus:ring-primary outline-none"
                     required
                   />

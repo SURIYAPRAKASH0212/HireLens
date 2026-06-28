@@ -199,12 +199,12 @@ export function AppProvider({ children }) {
   };
 
   // Upload Resume handler (contacts Express API)
-  const simulateUpload = async (fileName) => {
+  const simulateUpload = async (fileName, jobTitle, companyName) => {
     try {
       const res = await fetch('/api/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileName })
+        body: JSON.stringify({ fileName, jobTitle, companyName })
       });
       if (res.ok) {
         const data = await res.json();
